@@ -48,7 +48,7 @@ export default function HomePage() {
           🎤 推しのライブを見逃さない
         </h1>
         <p className="text-gray-500 text-sm">
-          地下アイドルのライブ情報をみんなで共有しよう
+          アイドルのライブ情報をみんなで共有しよう
         </p>
         {!session && (
           <div className="mt-4 flex justify-center gap-3">
