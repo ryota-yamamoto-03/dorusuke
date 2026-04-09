@@ -8,16 +8,20 @@ export async function GET(req: NextRequest) {
   const idolName = searchParams.get("idolName");
   const area = searchParams.get("area");
 
-  const lives = await prisma.live.findMany({
-    where: {
-      ...(idolName ? { idolName: { contains: idolName } } : {}),
-      ...(area ? { area } : {}),
-    },
-    include: { user: { select: { name: true } } },
-    orderBy: { date: "asc" },
-  });
-
-  return NextResponse.json(lives);
+  try {
+    const lives = await prisma.live.findMany({
+      where: {
+        ...(idolName ? { idolName: { contains: idolName } } : {}),
+        ...(area ? { area } : {}),
+      },
+      include: { user: { select: { name: true, xUrl: true } } },
+      orderBy: { date: "asc" },
+    });
+    return NextResponse.json(lives);
+  } catch (e) {
+    console.error("GET /api/lives error:", e);
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
