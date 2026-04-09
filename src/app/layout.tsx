@@ -10,8 +10,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ドルスケ - 地下アイドルライブ情報",
-  description: "地下アイドルのライブスケジュールを共有・検索できるサービス",
+  title: "ドルスケ - アイドルライブ情報",
+  description: "アイドルのライブスケジュールを共有・検索できるサービス",
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
