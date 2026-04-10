@@ -12,7 +12,8 @@ export async function GET(
     return NextResponse.json({ error: "ライブが見つかりません" }, { status: 404 });
   }
 
-  return NextResponse.json(live);
+  const { editToken: _, ...safeData } = live;
+  return NextResponse.json(safeData);
 }
 
 export async function PUT(
@@ -26,8 +27,13 @@ export async function PUT(
     return NextResponse.json({ error: "ライブが見つかりません" }, { status: 404 });
   }
 
-  const { liveName, idolName, date, dateUndecided, venue, area, link, posterName, xUrl } =
+  const { liveName, idolName, date, dateUndecided, venue, area, link, posterName, xUrl, editToken } =
     await req.json();
+
+  // トークン検証
+  if (!editToken || live.editToken !== editToken) {
+    return NextResponse.json({ error: "編集権限がありません" }, { status: 403 });
+  }
 
   if (!liveName || !idolName || !venue || !area || !link) {
     return NextResponse.json({ error: "必須項目を入力してください" }, { status: 400 });
@@ -54,11 +60,12 @@ export async function PUT(
     },
   });
 
-  return NextResponse.json(updated);
+  const { editToken: _, ...safeData } = updated;
+  return NextResponse.json(safeData);
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -68,7 +75,13 @@ export async function DELETE(
     return NextResponse.json({ error: "ライブが見つかりません" }, { status: 404 });
   }
 
-  await prisma.live.delete({ where: { id } });
+  const { editToken } = await req.json();
 
+  // トークン検証
+  if (!editToken || live.editToken !== editToken) {
+    return NextResponse.json({ error: "削除権限がありません" }, { status: 403 });
+  }
+
+  await prisma.live.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

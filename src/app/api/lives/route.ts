@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -23,7 +24,8 @@ export async function GET(req: NextRequest) {
       },
       orderBy: [{ dateUndecided: "asc" }, { date: "asc" }],
     });
-    return NextResponse.json(lives);
+    // editToken はレスポンスに含めない
+    return NextResponse.json(lives.map(({ editToken: _, ...l }) => l));
   } catch (e) {
     console.error("GET /api/lives error:", e);
     return NextResponse.json({ error: String(e) }, { status: 500 });
@@ -44,6 +46,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const editToken = randomUUID();
+
   const live = await prisma.live.create({
     data: {
       liveName,
@@ -55,8 +59,10 @@ export async function POST(req: NextRequest) {
       link,
       posterName: posterName || null,
       xUrl: xUrl || null,
+      editToken,
     },
   });
 
-  return NextResponse.json(live, { status: 201 });
+  // editToken をレスポンスに含めて返す（クライアントがlocalStorageに保存）
+  return NextResponse.json({ ...live }, { status: 201 });
 }

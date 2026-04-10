@@ -50,6 +50,14 @@ export default function NewLivePage() {
       return;
     }
 
+    const created = await res.json();
+    // 編集トークンをlocalStorageに保存
+    if (created.id && created.editToken) {
+      const stored = JSON.parse(localStorage.getItem("dorusuke_tokens") || "{}");
+      stored[created.id] = created.editToken;
+      localStorage.setItem("dorusuke_tokens", JSON.stringify(stored));
+    }
+
     router.push("/");
     router.refresh();
   };

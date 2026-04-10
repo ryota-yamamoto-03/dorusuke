@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import EditDeleteButtons from "./EditDeleteButtons";
 
 export default async function LiveDetailPage({
   params,
@@ -117,6 +118,9 @@ export default async function LiveDetailPage({
               </a>
             </div>
           )}
+
+          {/* 自分の投稿のみ：編集・削除 */}
+          <EditDeleteButtons liveId={live.id} />
         </div>
       </div>
     </div>
