@@ -97,24 +97,19 @@ export default function HomePage() {
         </div>
 
         {/* 日付カレンダー */}
-        <div className="mt-3 flex items-center gap-3">
-          <div className="relative flex-1 sm:flex-none">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
-              📅
-            </span>
-            <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="w-full sm:w-auto border border-gray-200 rounded-full pl-8 pr-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
-            />
-          </div>
+        <div className="mt-3 flex items-center gap-2">
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="flex-1 min-w-0 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
+          />
           {filterDate && (
             <button
               onClick={() => setFilterDate("")}
-              className="text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full"
+              className="shrink-0 text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full"
             >
-              日付クリア
+              クリア
             </button>
           )}
           {hasFilter && (
@@ -124,9 +119,9 @@ export default function HomePage() {
                 setFilterArea("");
                 setFilterDate("");
               }}
-              className="text-xs text-pink-400 hover:text-pink-600 ml-auto"
+              className="shrink-0 text-xs text-pink-400 hover:text-pink-600"
             >
-              すべてクリア
+              全クリア
             </button>
           )}
         </div>
