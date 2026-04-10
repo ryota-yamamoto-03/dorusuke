@@ -12,16 +12,13 @@ export default async function LiveDetailPage({
 }) {
   const { id } = await params;
   const [live, session] = await Promise.all([
-    prisma.live.findUnique({
-      where: { id },
-      include: { user: { select: { name: true, xUrl: true } } },
-    }),
+    prisma.live.findUnique({ where: { id } }),
     getServerSession(authOptions),
   ]);
 
   if (!live) notFound();
 
-  const isOwner = session?.user?.id === live.createdBy;
+  const isOwner = !!session?.user?.id && session.user.id === live.createdBy;
 
   const dateLabel = (() => {
     if (live.dateUndecided || !live.date) return "日時未定";
@@ -29,7 +26,9 @@ export default async function LiveDetailPage({
     const dateStr = d.toLocaleDateString("ja-JP", {
       year: "numeric", month: "long", day: "numeric", weekday: "long", timeZone: "Asia/Tokyo",
     });
-    const timeStr = d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
+    const timeStr = d.toLocaleTimeString("ja-JP", {
+      hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo",
+    });
     return `${dateStr} ${timeStr}〜`;
   })();
 
@@ -75,18 +74,18 @@ export default async function LiveDetailPage({
             </div>
           </div>
 
-          {live.user && (
+          {live.posterName && (
             <div className="flex items-start gap-3">
               <span className="text-xl">👤</span>
               <div>
                 <p className="text-xs text-gray-400 font-medium">投稿者</p>
-                {live.user.xUrl ? (
-                  <a href={live.user.xUrl} target="_blank" rel="noopener noreferrer"
+                {live.posterXUrl ? (
+                  <a href={live.posterXUrl} target="_blank" rel="noopener noreferrer"
                     className="text-sky-500 hover:underline font-medium flex items-center gap-1">
-                    𝕏 {live.user.name}
+                    𝕏 {live.posterName}
                   </a>
                 ) : (
-                  <p className="text-gray-800 font-medium">{live.user.name}</p>
+                  <p className="text-gray-800 font-medium">{live.posterName}</p>
                 )}
               </div>
             </div>

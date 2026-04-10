@@ -28,6 +28,8 @@ model Live {
   link          String
   createdBy     String?
   user          User?     @relation(fields: [createdBy], references: [id])
+  posterName    String?
+  posterXUrl    String?
   editToken     String?
   createdAt     DateTime  @default(now())
 }

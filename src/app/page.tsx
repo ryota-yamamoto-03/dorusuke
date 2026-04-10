@@ -14,7 +14,8 @@ type Live = {
   venue: string;
   area: string;
   link: string | null;
-  user: { name: string; xUrl?: string | null } | null;
+  posterName: string | null;
+  posterXUrl: string | null;
 };
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];

@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
             }
           : {}),
       },
-      include: { user: { select: { name: true, xUrl: true } } },
       orderBy: [{ dateUndecided: "asc" }, { date: "asc" }],
     });
     return NextResponse.json(lives);
@@ -51,6 +50,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // ログインユーザーの情報を取得してLiveに直接保存
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, xUrl: true },
+  });
+
   const live = await prisma.live.create({
     data: {
       liveName,
@@ -61,8 +66,9 @@ export async function POST(req: NextRequest) {
       area,
       link,
       createdBy: session.user.id,
+      posterName: user?.name ?? session.user.name,
+      posterXUrl: user?.xUrl ?? null,
     },
-    include: { user: { select: { name: true, xUrl: true } } },
   });
 
   return NextResponse.json(live, { status: 201 });
