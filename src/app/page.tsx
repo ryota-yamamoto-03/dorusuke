@@ -98,12 +98,17 @@ export default function HomePage() {
 
         {/* 日付カレンダー */}
         <div className="mt-3 flex items-center gap-2">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-            className="flex-1 min-w-0 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
-          />
+          <div className="relative flex-1 min-w-0">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none select-none">
+              📅
+            </span>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
+            />
+          </div>
           {filterDate && (
             <button
               onClick={() => setFilterDate("")}
