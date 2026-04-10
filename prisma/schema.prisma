@@ -21,7 +21,8 @@ model Live {
   id        String   @id @default(cuid())
   liveName  String
   idolName  String
-  date      DateTime
+  date      DateTime?
+  dateUndecided Boolean @default(false)
   venue     String
   area      String
   link      String

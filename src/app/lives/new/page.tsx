@@ -18,6 +18,7 @@ export default function NewLivePage() {
     area: "",
     link: "",
   });
+  const [dateUndecided, setDateUndecided] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +55,7 @@ export default function NewLivePage() {
     const res = await fetch("/api/lives", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, dateUndecided }),
     });
 
     if (!res.ok) {
@@ -114,17 +115,37 @@ export default function NewLivePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              日時 <span className="text-pink-500">*</span>
-            </label>
-            <input
-              type="datetime-local"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm font-medium text-gray-700">
+                日時 {!dateUndecided && <span className="text-pink-500">*</span>}
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={dateUndecided}
+                  onChange={(e) => {
+                    setDateUndecided(e.target.checked);
+                    if (e.target.checked) setForm({ ...form, date: "" });
+                  }}
+                  className="w-4 h-4 accent-pink-500"
+                />
+                <span className="text-sm text-gray-500">📋 日時未定</span>
+              </label>
+            </div>
+            {dateUndecided ? (
+              <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">
+                日時未定
+              </div>
+            ) : (
+              <input
+                type="datetime-local"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                required={!dateUndecided}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+              />
+            )}
           </div>
 
           <div>
@@ -155,9 +176,7 @@ export default function NewLivePage() {
             >
               <option value="">選択してください</option>
               {AREAS.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
+                <option key={a} value={a}>{a}</option>
               ))}
             </select>
           </div>

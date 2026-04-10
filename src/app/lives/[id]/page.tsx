@@ -23,17 +23,15 @@ export default async function LiveDetailPage({
 
   const isOwner = session?.user?.id === live.createdBy;
 
-  const date = new Date(live.date);
-  const dateStr = date.toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
-  const timeStr = date.toLocaleTimeString("ja-JP", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const dateLabel = (() => {
+    if (live.dateUndecided || !live.date) return "日時未定";
+    const d = new Date(live.date);
+    const dateStr = d.toLocaleDateString("ja-JP", {
+      year: "numeric", month: "long", day: "numeric", weekday: "long",
+    });
+    const timeStr = d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    return `${dateStr} ${timeStr}〜`;
+  })();
 
   return (
     <div className="max-w-lg mx-auto">
@@ -64,8 +62,8 @@ export default async function LiveDetailPage({
             <span className="text-xl">📅</span>
             <div>
               <p className="text-xs text-gray-400 font-medium">日時</p>
-              <p className="text-gray-800 font-medium">
-                {dateStr} {timeStr}〜
+              <p className={`font-medium ${live.dateUndecided || !live.date ? "text-pink-400" : "text-gray-800"}`}>
+                {dateLabel}
               </p>
             </div>
           </div>

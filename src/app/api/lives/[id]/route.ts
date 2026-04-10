@@ -39,15 +39,26 @@ export async function PUT(
     return NextResponse.json({ error: "編集権限がありません" }, { status: 403 });
   }
 
-  const { liveName, idolName, date, venue, area, link } = await req.json();
+  const { liveName, idolName, date, dateUndecided, venue, area, link } = await req.json();
 
-  if (!liveName || !idolName || !date || !venue || !area || !link) {
+  if (!liveName || !idolName || !venue || !area || !link) {
     return NextResponse.json({ error: "必須項目を入力してください" }, { status: 400 });
+  }
+  if (!dateUndecided && !date) {
+    return NextResponse.json({ error: "日時を入力するか「日時未定」にチェックしてください" }, { status: 400 });
   }
 
   const updated = await prisma.live.update({
     where: { id },
-    data: { liveName, idolName, date: new Date(date), venue, area, link },
+    data: {
+      liveName,
+      idolName,
+      date: dateUndecided ? null : new Date(date),
+      dateUndecided: !!dateUndecided,
+      venue,
+      area,
+      link,
+    },
     include: { user: { select: { name: true, xUrl: true } } },
   });
 

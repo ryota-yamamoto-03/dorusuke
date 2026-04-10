@@ -39,17 +39,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
   }
 
-  const { liveName, idolName, date, venue, area, link } = await req.json();
+  const { liveName, idolName, date, dateUndecided, venue, area, link } = await req.json();
 
-  if (!liveName || !idolName || !date || !venue || !area || !link) {
+  if (!liveName || !idolName || !venue || !area || !link) {
     return NextResponse.json({ error: "必須項目を入力してください" }, { status: 400 });
+  }
+  if (!dateUndecided && !date) {
+    return NextResponse.json({ error: "日時を入力するか「日時未定」にチェックしてください" }, { status: 400 });
   }
 
   const live = await prisma.live.create({
     data: {
       liveName,
       idolName,
-      date: new Date(date),
+      date: dateUndecided ? null : new Date(date),
+      dateUndecided: !!dateUndecided,
       venue,
       area,
       link,

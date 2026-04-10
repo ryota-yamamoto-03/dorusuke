@@ -4,24 +4,23 @@ type Live = {
   id: string;
   liveName: string;
   idolName: string;
-  date: string;
+  date: string | null;
+  dateUndecided: boolean;
   venue: string;
   area: string;
   user: { name: string; xUrl?: string | null };
 };
 
 export default function LiveCard({ live }: { live: Live }) {
-  const date = new Date(live.date);
-  const dateStr = date.toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  });
-  const timeStr = date.toLocaleTimeString("ja-JP", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const dateLabel = (() => {
+    if (live.dateUndecided || !live.date) return "日時未定";
+    const d = new Date(live.date);
+    const dateStr = d.toLocaleDateString("ja-JP", {
+      year: "numeric", month: "long", day: "numeric", weekday: "short",
+    });
+    const timeStr = d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    return `${dateStr} ${timeStr}〜`;
+  })();
 
   return (
     <Link href={`/lives/${live.id}`}>
@@ -45,8 +44,8 @@ export default function LiveCard({ live }: { live: Live }) {
         <div className="mt-3 space-y-1 text-sm text-gray-500">
           <div className="flex items-center gap-1.5">
             <span>📅</span>
-            <span>
-              {dateStr} {timeStr}〜
+            <span className={live.dateUndecided || !live.date ? "text-pink-400 font-medium" : ""}>
+              {dateLabel}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
