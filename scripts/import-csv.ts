@@ -17,9 +17,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// 投稿者として使うユーザーID（後述の手順で確認）
-const IMPORT_USER_EMAIL = process.env.IMPORT_USER_EMAIL || "";
-
 async function main() {
   const csvPath = process.argv[2];
   if (!csvPath) {
@@ -32,21 +29,6 @@ async function main() {
     console.error(`ファイルが見つかりません: ${absolutePath}`);
     process.exit(1);
   }
-
-  // 投稿者ユーザーを取得
-  if (!IMPORT_USER_EMAIL) {
-    console.error("環境変数 IMPORT_USER_EMAIL にインポート投稿者のメールアドレスを設定してください");
-    console.error("例: IMPORT_USER_EMAIL=test@example.com npx ts-node scripts/import-csv.ts data.csv");
-    process.exit(1);
-  }
-
-  const user = await prisma.user.findUnique({ where: { email: IMPORT_USER_EMAIL } });
-  if (!user) {
-    console.error(`ユーザーが見つかりません: ${IMPORT_USER_EMAIL}`);
-    process.exit(1);
-  }
-
-  console.log(`投稿者: ${user.name} (${user.email})`);
 
   // CSV読み込み
   const content = fs.readFileSync(absolutePath, "utf-8");
@@ -85,7 +67,6 @@ async function main() {
           venue: row.venue,
           area: row.area,
           link: row.link,
-          createdBy: user.id,
         },
       });
       success++;

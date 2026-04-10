@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];
 
 export default function NewLivePage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [form, setForm] = useState({
     liveName: "",
@@ -17,29 +15,12 @@ export default function NewLivePage() {
     venue: "",
     area: "",
     link: "",
+    posterName: "",
+    xUrl: "",
   });
   const [dateUndecided, setDateUndecided] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  if (status === "loading") {
-    return <div className="text-center py-20 text-gray-400">読み込み中...</div>;
-  }
-
-  if (!session) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-4xl mb-4">🔒</div>
-        <p className="text-gray-600 mb-4">投稿にはログインが必要です</p>
-        <Link
-          href="/login"
-          className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition"
-        >
-          ログインする
-        </Link>
-      </div>
-    );
-  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -187,7 +168,7 @@ export default function NewLivePage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              ライブ詳細 <span className="text-pink-500">*</span>
+              ライブ詳細URL <span className="text-pink-500">*</span>
             </label>
             <input
               type="url"
@@ -198,6 +179,39 @@ export default function NewLivePage() {
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="https://..."
             />
+          </div>
+
+          {/* 投稿者情報（任意） */}
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-400 mb-3">投稿者情報（任意）</p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  投稿者名
+                </label>
+                <input
+                  type="text"
+                  name="posterName"
+                  value={form.posterName}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+                  placeholder="例：推し活太郎"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  𝕏（Twitter）URL
+                </label>
+                <input
+                  type="url"
+                  name="xUrl"
+                  value={form.xUrl}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+                  placeholder="https://x.com/yourname"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-2">

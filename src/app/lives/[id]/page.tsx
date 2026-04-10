@@ -1,9 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import DeleteButton from "./DeleteButton";
 
 export default async function LiveDetailPage({
   params,
@@ -11,17 +8,9 @@ export default async function LiveDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [live, session] = await Promise.all([
-    prisma.live.findUnique({
-      where: { id },
-      include: { user: { select: { name: true, xUrl: true } } },
-    }),
-    getServerSession(authOptions),
-  ]);
+  const live = await prisma.live.findUnique({ where: { id } });
 
   if (!live) notFound();
-
-  const isOwner = session?.user?.id === live.createdBy;
 
   const dateLabel = (() => {
     if (live.dateUndecided || !live.date) return "日時未定";
@@ -84,31 +73,33 @@ export default async function LiveDetailPage({
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <span className="text-xl">👤</span>
-            <div>
-              <p className="text-xs text-gray-400 font-medium">投稿者</p>
-              {live.user.xUrl ? (
-                <a
-                  href={live.user.xUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sky-500 hover:underline font-medium flex items-center gap-1"
-                >
-                  𝕏 {live.user.name}
-                </a>
-              ) : (
-                <p className="text-gray-800 font-medium">{live.user.name}</p>
-              )}
+          {live.posterName && (
+            <div className="flex items-start gap-3">
+              <span className="text-xl">👤</span>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">投稿者</p>
+                {live.xUrl ? (
+                  <a
+                    href={live.xUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-500 hover:underline font-medium flex items-center gap-1"
+                  >
+                    𝕏 {live.posterName}
+                  </a>
+                ) : (
+                  <p className="text-gray-800 font-medium">{live.posterName}</p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-start gap-3">
             <span className="text-xl">🕐</span>
             <div>
               <p className="text-xs text-gray-400 font-medium">投稿日</p>
               <p className="text-gray-800 font-medium">
-                {live.createdAt.toLocaleDateString("ja-JP")}
+                {live.createdAt.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })}
               </p>
             </div>
           </div>
@@ -124,19 +115,6 @@ export default async function LiveDetailPage({
               >
                 🎫 ライブ詳細
               </a>
-            </div>
-          )}
-
-          {/* 自分の投稿のみ：編集・削除 */}
-          {isOwner && (
-            <div className="pt-4 border-t border-gray-100 flex gap-3">
-              <Link
-                href={`/lives/${live.id}/edit`}
-                className="flex-1 text-center border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition text-sm font-medium"
-              >
-                ✏️ 編集
-              </Link>
-              <DeleteButton liveId={live.id} />
             </div>
           )}
         </div>

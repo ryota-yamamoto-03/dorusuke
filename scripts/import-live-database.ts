@@ -55,19 +55,6 @@ function parseCsvLine(line: string): string[] {
 }
 
 async function main() {
-  const importEmail = process.env.IMPORT_USER_EMAIL;
-  if (!importEmail) {
-    console.error("環境変数 IMPORT_USER_EMAIL を設定してください");
-    console.error("例: IMPORT_USER_EMAIL=test@example.com npx ts-node --project tsconfig.scripts.json scripts/import-live-database.ts");
-    process.exit(1);
-  }
-
-  const user = await prisma.user.findUnique({ where: { email: importEmail } });
-  if (!user) {
-    console.error(`ユーザーが見つかりません: ${importEmail}`);
-    process.exit(1);
-  }
-  console.log(`投稿者: ${user.name} (${user.email})\n`);
 
   const content = fs.readFileSync(CSV_PATH, "utf-8");
   const lines = content.split("\n").filter((l) => l.trim());
@@ -128,7 +115,6 @@ async function main() {
           venue,
           area,
           link,
-          createdBy: user.id,
         },
       });
       success++;

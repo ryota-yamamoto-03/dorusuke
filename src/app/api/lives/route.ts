@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
@@ -17,14 +15,13 @@ export async function GET(req: NextRequest) {
         ...(date
           ? {
               date: {
-                gte: new Date(`${date}T00:00:00.000Z`),
-                lt: new Date(`${date}T23:59:59.999Z`),
+                gte: new Date(`${date}T00:00:00.000+09:00`),
+                lt:  new Date(`${date}T23:59:59.999+09:00`),
               },
             }
           : {}),
       },
-      include: { user: { select: { name: true, xUrl: true } } },
-      orderBy: { date: "asc" },
+      orderBy: [{ dateUndecided: "asc" }, { date: "asc" }],
     });
     return NextResponse.json(lives);
   } catch (e) {
@@ -34,18 +31,17 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
-  }
-
-  const { liveName, idolName, date, dateUndecided, venue, area, link } = await req.json();
+  const { liveName, idolName, date, dateUndecided, venue, area, link, posterName, xUrl } =
+    await req.json();
 
   if (!liveName || !idolName || !venue || !area || !link) {
     return NextResponse.json({ error: "必須項目を入力してください" }, { status: 400 });
   }
   if (!dateUndecided && !date) {
-    return NextResponse.json({ error: "日時を入力するか「日時未定」にチェックしてください" }, { status: 400 });
+    return NextResponse.json(
+      { error: "日時を入力するか「日時未定」にチェックしてください" },
+      { status: 400 }
+    );
   }
 
   const live = await prisma.live.create({
@@ -57,9 +53,9 @@ export async function POST(req: NextRequest) {
       venue,
       area,
       link,
-      createdBy: session.user.id,
+      posterName: posterName || null,
+      xUrl: xUrl || null,
     },
-    include: { user: { select: { name: true } } },
   });
 
   return NextResponse.json(live, { status: 201 });
