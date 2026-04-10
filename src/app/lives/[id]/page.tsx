@@ -27,9 +27,9 @@ export default async function LiveDetailPage({
     if (live.dateUndecided || !live.date) return "日時未定";
     const d = new Date(live.date);
     const dateStr = d.toLocaleDateString("ja-JP", {
-      year: "numeric", month: "long", day: "numeric", weekday: "long",
+      year: "numeric", month: "long", day: "numeric", weekday: "long", timeZone: "Asia/Tokyo",
     });
-    const timeStr = d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" });
     return `${dateStr} ${timeStr}〜`;
   })();
 
