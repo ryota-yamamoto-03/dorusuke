@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import LiveCard from "@/components/LiveCard";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 type Live = {
   id: string;
@@ -13,13 +14,13 @@ type Live = {
   venue: string;
   area: string;
   link: string | null;
-  posterName: string | null;
-  xUrl: string | null;
+  user: { name: string; xUrl?: string | null } | null;
 };
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];
 
 export default function HomePage() {
+  const { data: session } = useSession();
   const [lives, setLives] = useState<Live[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchIdol, setSearchIdol] = useState("");
@@ -54,14 +55,22 @@ export default function HomePage() {
         <p className="text-gray-500 text-sm">
           アイドルのライブ情報をみんなで共有しよう
         </p>
-        <div className="mt-4 flex justify-center">
-          <Link
-            href="/lives/new"
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition"
-          >
-            ＋ ライブを投稿する
-          </Link>
-        </div>
+        {!session && (
+          <div className="mt-4 flex justify-center gap-3">
+            <Link
+              href="/register"
+              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition"
+            >
+              無料で始める
+            </Link>
+            <Link
+              href="/login"
+              className="border border-pink-300 text-pink-600 px-6 py-2 rounded-full font-medium hover:bg-pink-50 transition"
+            >
+              ログイン
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* 検索・フィルター */}
@@ -138,7 +147,7 @@ export default function HomePage() {
           <p className="mb-4">
             {hasFilter ? "該当するライブが見つかりません" : "まだライブ情報がありません"}
           </p>
-          {!hasFilter && (
+          {session && !hasFilter && (
             <Link
               href="/lives/new"
               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition"
