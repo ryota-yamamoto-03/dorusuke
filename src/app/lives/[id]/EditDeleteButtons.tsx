@@ -1,35 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function EditDeleteButtons({ liveId }: { liveId: string }) {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("dorusuke_tokens") || "{}");
-    if (stored[liveId]) setToken(stored[liveId]);
-  }, [liveId]);
-
-  if (!token) return null;
-
   const handleDelete = async () => {
     setDeleting(true);
-    const res = await fetch(`/api/lives/${liveId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ editToken: token }),
-    });
+    const res = await fetch(`/api/lives/${liveId}`, { method: "DELETE" });
 
     if (res.ok) {
-      // トークンを削除
-      const stored = JSON.parse(localStorage.getItem("dorusuke_tokens") || "{}");
-      delete stored[liveId];
-      localStorage.setItem("dorusuke_tokens", JSON.stringify(stored));
       router.push("/");
       router.refresh();
     } else {

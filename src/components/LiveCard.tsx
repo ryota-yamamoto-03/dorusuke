@@ -8,8 +8,7 @@ type Live = {
   dateUndecided: boolean;
   venue: string;
   area: string;
-  posterName: string | null;
-  xUrl: string | null;
+  user: { name: string; xUrl?: string | null } | null;
 };
 
 export default function LiveCard({ live }: { live: Live }) {
@@ -55,21 +54,21 @@ export default function LiveCard({ live }: { live: Live }) {
           </div>
         </div>
 
-        {live.posterName && (
+        {live.user && (
           <div className="mt-3 pt-2 border-t border-gray-100 text-xs text-gray-400 flex items-center gap-1.5">
             <span>投稿者:</span>
-            {live.xUrl ? (
+            {live.user.xUrl ? (
               <span
                 className="text-sky-500 hover:underline flex items-center gap-1"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.open(live.xUrl!, "_blank", "noopener,noreferrer");
+                  window.open(live.user!.xUrl!, "_blank", "noopener,noreferrer");
                 }}
               >
-                𝕏 {live.posterName}
+                𝕏 {live.user.name}
               </span>
             ) : (
-              <span>{live.posterName}</span>
+              <span>{live.user.name}</span>
             )}
           </div>
         )}

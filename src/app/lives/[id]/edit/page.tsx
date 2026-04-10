@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];
 
 export default function EditLivePage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
   const liveId = params.id as string;
@@ -18,28 +20,18 @@ export default function EditLivePage() {
     venue: "",
     area: "",
     link: "",
-    posterName: "",
-    xUrl: "",
   });
   const [dateUndecided, setDateUndecided] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     if (!liveId) return;
-
-    // localStorageからトークン取得
-    const stored = JSON.parse(localStorage.getItem("dorusuke_tokens") || "{}");
-    const t = stored[liveId] || null;
-    setToken(t);
-
     fetch(`/api/lives/${liveId}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) { setError(data.error); return; }
-
         setDateUndecided(!!data.dateUndecided);
         let localDate = "";
         if (!data.dateUndecided && data.date) {
@@ -54,30 +46,25 @@ export default function EditLivePage() {
           venue: data.venue,
           area: data.area,
           link: data.link || "",
-          posterName: data.posterName || "",
-          xUrl: data.xUrl || "",
         });
         setFetching(false);
       });
   }, [liveId]);
 
-  if (fetching) {
+  if (status === "loading" || fetching) {
     return <div className="text-center py-20 text-gray-400">読み込み中...</div>;
   }
 
-  if (!token) {
+  if (!session) {
     return (
       <div className="text-center py-20">
-        <div className="text-4xl mb-4">🔒</div>
-        <p className="text-gray-600 mb-4">この投稿を編集する権限がありません</p>
-        <Link href="/" className="text-pink-500 underline">トップに戻る</Link>
+        <p className="text-gray-600 mb-4">ログインが必要です</p>
+        <Link href="/login" className="text-pink-500 underline">ログイン</Link>
       </div>
     );
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -93,7 +80,6 @@ export default function EditLivePage() {
         ...form,
         date: form.date ? form.date + "+09:00" : "",
         dateUndecided,
-        editToken: token,
       }),
     });
 
@@ -183,24 +169,6 @@ export default function EditLivePage() {
             <input type="url" name="link" value={form.link} onChange={handleChange} required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="https://..." />
-          </div>
-
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-400 mb-3">投稿者情報（任意）</p>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">投稿者名</label>
-                <input type="text" name="posterName" value={form.posterName} onChange={handleChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
-                  placeholder="例：推し活太郎" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">𝕏（Twitter）URL</label>
-                <input type="url" name="xUrl" value={form.xUrl} onChange={handleChange}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
-                  placeholder="https://x.com/yourname" />
-              </div>
-            </div>
           </div>
 
           <div className="flex gap-3 pt-2">

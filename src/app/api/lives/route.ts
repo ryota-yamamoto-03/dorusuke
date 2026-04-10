@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { randomUUID } from "crypto";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -22,10 +23,10 @@ export async function GET(req: NextRequest) {
             }
           : {}),
       },
+      include: { user: { select: { name: true, xUrl: true } } },
       orderBy: [{ dateUndecided: "asc" }, { date: "asc" }],
     });
-    // editToken はレスポンスに含めない
-    return NextResponse.json(lives.map(({ editToken: _, ...l }) => l));
+    return NextResponse.json(lives);
   } catch (e) {
     console.error("GET /api/lives error:", e);
     return NextResponse.json({ error: String(e) }, { status: 500 });
@@ -33,8 +34,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { liveName, idolName, date, dateUndecided, venue, area, link, posterName, xUrl } =
-    await req.json();
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
+  }
+
+  const { liveName, idolName, date, dateUndecided, venue, area, link } = await req.json();
 
   if (!liveName || !idolName || !venue || !area || !link) {
     return NextResponse.json({ error: "必須項目を入力してください" }, { status: 400 });
@@ -46,8 +51,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const editToken = randomUUID();
-
   const live = await prisma.live.create({
     data: {
       liveName,
@@ -57,12 +60,10 @@ export async function POST(req: NextRequest) {
       venue,
       area,
       link,
-      posterName: posterName || null,
-      xUrl: xUrl || null,
-      editToken,
+      createdBy: session.user.id,
     },
+    include: { user: { select: { name: true, xUrl: true } } },
   });
 
-  // editToken をレスポンスに含めて返す（クライアントがlocalStorageに保存）
-  return NextResponse.json({ ...live }, { status: 201 });
+  return NextResponse.json(live, { status: 201 });
 }

@@ -7,6 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  xUrl      String?
+  createdAt DateTime @default(now())
+  lives     Live[]
+}
+
 model Live {
   id            String    @id @default(cuid())
   liveName      String
@@ -16,8 +26,8 @@ model Live {
   venue         String
   area          String
   link          String
-  posterName    String?
-  xUrl          String?
+  createdBy     String?
+  user          User?     @relation(fields: [createdBy], references: [id])
   editToken     String?
   createdAt     DateTime  @default(now())
 }
