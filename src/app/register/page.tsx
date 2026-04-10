@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", xUrl: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -85,6 +85,19 @@ export default function RegisterPage() {
               minLength={6}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="6文字以上"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              𝕏（Twitter）URL <span className="text-gray-400 text-xs font-normal">任意</span>
+            </label>
+            <input
+              type="url"
+              value={form.xUrl}
+              onChange={(e) => setForm({ ...form, xUrl: e.target.value })}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+              placeholder="https://x.com/yourname"
             />
           </div>
 
