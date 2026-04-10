@@ -75,61 +75,63 @@ export default function HomePage() {
 
       {/* 検索・フィルター */}
       <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* アイドル名検索 */}
-          <input
-            type="text"
-            placeholder="🔍 アイドル名で検索..."
-            value={searchIdol}
-            onChange={(e) => setSearchIdol(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
-          />
-          {/* エリアフィルター */}
-          <select
-            value={filterArea}
-            onChange={(e) => setFilterArea(e.target.value)}
-            className="border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white"
-          >
-            <option value="">エリア: すべて</option>
-            {AREAS.map((a) => (
-              <option key={a} value={a}>{a}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* 日付カレンダー */}
-        <div className="mt-3 flex items-center gap-2">
-          <div className="relative flex-1 min-w-0">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none select-none">
-              📅
-            </span>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* アイドル名検索 */}
             <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
+              type="text"
+              placeholder="🔍 アイドル名で検索..."
+              value={searchIdol}
+              onChange={(e) => setSearchIdol(e.target.value)}
+              className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
             />
+            {/* エリアフィルター */}
+            <select
+              value={filterArea}
+              onChange={(e) => setFilterArea(e.target.value)}
+              className="border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white"
+            >
+              <option value="">エリア: すべて</option>
+              {AREAS.map((a) => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
           </div>
-          {filterDate && (
-            <button
-              onClick={() => setFilterDate("")}
-              className="shrink-0 text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full"
-            >
-              クリア
-            </button>
-          )}
-          {hasFilter && (
-            <button
-              onClick={() => {
-                setSearchIdol("");
-                setFilterArea("");
-                setFilterDate("");
-              }}
-              className="shrink-0 text-xs text-pink-400 hover:text-pink-600"
-            >
-              全クリア
-            </button>
-          )}
+
+          {/* 日付カレンダー */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 min-w-0">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none select-none">
+                📅
+              </span>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
+              />
+            </div>
+            {filterDate && (
+              <button
+                onClick={() => setFilterDate("")}
+                className="shrink-0 text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full"
+              >
+                クリア
+              </button>
+            )}
+            {hasFilter && (
+              <button
+                onClick={() => {
+                  setSearchIdol("");
+                  setFilterArea("");
+                  setFilterDate("");
+                }}
+                className="shrink-0 text-xs text-pink-400 hover:text-pink-600"
+              >
+                全クリア
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
