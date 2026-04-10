@@ -38,10 +38,10 @@ export default function EditLivePage() {
         setDateUndecided(!!data.dateUndecided);
         let localDate = "";
         if (!data.dateUndecided && data.date) {
+          // UTCからJST（+9時間）に変換してdatetime-localに表示
           const d = new Date(data.date);
-          localDate = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
+          const jstDate = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+          localDate = jstDate.toISOString().slice(0, 16);
         }
         setForm({
           liveName: data.liveName,
@@ -82,7 +82,11 @@ export default function EditLivePage() {
     const res = await fetch(`/api/lives/${liveId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, dateUndecided }),
+      body: JSON.stringify({
+        ...form,
+        date: form.date ? form.date + "+09:00" : "",
+        dateUndecided,
+      }),
     });
 
     if (!res.ok) {

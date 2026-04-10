@@ -55,7 +55,11 @@ export default function NewLivePage() {
     const res = await fetch("/api/lives", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, dateUndecided }),
+      body: JSON.stringify({
+        ...form,
+        date: form.date ? form.date + "+09:00" : "",
+        dateUndecided,
+      }),
     });
 
     if (!res.ok) {
