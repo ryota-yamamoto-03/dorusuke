@@ -13,7 +13,7 @@ type Live = {
   venue: string;
   area: string;
   link: string | null;
-  user: { name: string };
+  user: { name: string; xUrl?: string | null };
 };
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];
@@ -24,21 +24,25 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [searchIdol, setSearchIdol] = useState("");
   const [filterArea, setFilterArea] = useState("");
+  const [filterDate, setFilterDate] = useState("");
 
-  const fetchLives = async (idol: string, area: string) => {
+  const fetchLives = async (idol: string, area: string, date: string) => {
     setLoading(true);
     const params = new URLSearchParams();
     if (idol) params.set("idolName", idol);
     if (area) params.set("area", area);
+    if (date) params.set("date", date);
     const res = await fetch(`/api/lives?${params}`);
     const data = await res.json();
-    setLives(data);
+    setLives(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchLives(searchIdol, filterArea);
-  }, [searchIdol, filterArea]);
+    fetchLives(searchIdol, filterArea, filterDate);
+  }, [searchIdol, filterArea, filterDate]);
+
+  const hasFilter = searchIdol || filterArea || filterDate;
 
   return (
     <div>
@@ -69,37 +73,63 @@ export default function HomePage() {
       </div>
 
       {/* 検索・フィルター */}
-      <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-4 mb-6 flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          placeholder="🔍 アイドル名で検索..."
-          value={searchIdol}
-          onChange={(e) => setSearchIdol(e.target.value)}
-          className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
-        />
-        <select
-          value={filterArea}
-          onChange={(e) => setFilterArea(e.target.value)}
-          className="border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white"
-        >
-          <option value="">エリア: すべて</option>
-          {AREAS.map((a) => (
-            <option key={a} value={a}>
-              {a}
-            </option>
-          ))}
-        </select>
-        {(searchIdol || filterArea) && (
-          <button
-            onClick={() => {
-              setSearchIdol("");
-              setFilterArea("");
-            }}
-            className="text-sm text-gray-400 hover:text-gray-600"
+      <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* アイドル名検索 */}
+          <input
+            type="text"
+            placeholder="🔍 アイドル名で検索..."
+            value={searchIdol}
+            onChange={(e) => setSearchIdol(e.target.value)}
+            className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
+          />
+          {/* エリアフィルター */}
+          <select
+            value={filterArea}
+            onChange={(e) => setFilterArea(e.target.value)}
+            className="border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white"
           >
-            クリア
-          </button>
-        )}
+            <option value="">エリア: すべて</option>
+            {AREAS.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* 日付カレンダー */}
+        <div className="mt-3 flex items-center gap-3">
+          <div className="relative flex-1 sm:flex-none">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+              📅
+            </span>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="w-full sm:w-auto border border-gray-200 rounded-full pl-8 pr-4 py-2 text-sm focus:outline-none focus:border-pink-400 bg-white text-gray-700"
+            />
+          </div>
+          {filterDate && (
+            <button
+              onClick={() => setFilterDate("")}
+              className="text-xs text-gray-400 hover:text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full"
+            >
+              日付クリア
+            </button>
+          )}
+          {hasFilter && (
+            <button
+              onClick={() => {
+                setSearchIdol("");
+                setFilterArea("");
+                setFilterDate("");
+              }}
+              className="text-xs text-pink-400 hover:text-pink-600 ml-auto"
+            >
+              すべてクリア
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ライブ一覧 */}
@@ -111,8 +141,10 @@ export default function HomePage() {
       ) : lives.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-4xl mb-2">🎤</div>
-          <p className="mb-4">まだライブ情報がありません</p>
-          {session && (
+          <p className="mb-4">
+            {hasFilter ? "該当するライブが見つかりません" : "まだライブ情報がありません"}
+          </p>
+          {session && !hasFilter && (
             <Link
               href="/lives/new"
               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition"

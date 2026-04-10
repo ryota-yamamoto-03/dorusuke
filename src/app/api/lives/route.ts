@@ -7,12 +7,21 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const idolName = searchParams.get("idolName");
   const area = searchParams.get("area");
+  const date = searchParams.get("date"); // YYYY-MM-DD
 
   try {
     const lives = await prisma.live.findMany({
       where: {
         ...(idolName ? { idolName: { contains: idolName } } : {}),
         ...(area ? { area } : {}),
+        ...(date
+          ? {
+              date: {
+                gte: new Date(`${date}T00:00:00.000Z`),
+                lt: new Date(`${date}T23:59:59.999Z`),
+              },
+            }
+          : {}),
       },
       include: { user: { select: { name: true, xUrl: true } } },
       orderBy: { date: "asc" },
