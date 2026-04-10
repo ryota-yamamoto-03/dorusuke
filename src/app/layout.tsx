@@ -16,6 +16,28 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     apple: "/logo.png",
   },
+  openGraph: {
+    title: "ドルスケ - アイドルライブ情報",
+    description: "アイドルのライブスケジュールを共有・検索できるサービス",
+    url: "https://dorusuke.vercel.app",
+    siteName: "ドルスケ",
+    locale: "ja_JP",
+    type: "website",
+    images: [
+      {
+        url: "https://dorusuke.vercel.app/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "ドルスケ - アイドルライブ情報",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "ドルスケ - アイドルライブ情報",
+    description: "アイドルのライブスケジュールを共有・検索できるサービス",
+    images: ["https://dorusuke.vercel.app/logo.png"],
+  },
 };
 
 export default function RootLayout({
