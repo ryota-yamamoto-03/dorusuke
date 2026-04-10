@@ -9,7 +9,8 @@ type Live = {
   id: string;
   liveName: string;
   idolName: string;
-  date: string;
+  date: string | null;
+  dateUndecided: boolean;
   venue: string;
   area: string;
   link: string | null;
