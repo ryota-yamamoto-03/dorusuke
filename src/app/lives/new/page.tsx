@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -21,6 +21,16 @@ export default function NewLivePage() {
   const [dateUndecided, setDateUndecided] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [idolSuggestions, setIdolSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [allIdolNames, setAllIdolNames] = useState<string[]>([]);
+
+  // アイドル名一覧を取得
+  useEffect(() => {
+    fetch("/api/idols").then((r) => r.json()).then((data) => {
+      if (Array.isArray(data)) setAllIdolNames(data);
+    });
+  }, []);
 
   if (status === "loading") {
     return <div className="text-center py-20 text-gray-400">読み込み中...</div>;
@@ -41,10 +51,26 @@ export default function NewLivePage() {
     );
   }
 
+  const idolInputRef = useRef<HTMLInputElement>(null);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "idolName") {
+      if (value.trim() === "") {
+        setShowSuggestions(false);
+        setIdolSuggestions([]);
+      } else {
+        const filtered = allIdolNames.filter((n) =>
+          n.toLowerCase().includes(value.toLowerCase())
+        );
+        setIdolSuggestions(filtered.slice(0, 8));
+        setShowSuggestions(filtered.length > 0);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,19 +129,41 @@ export default function NewLivePage() {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               アイドル名 <span className="text-pink-500">*</span>
             </label>
             <input
+              ref={idolInputRef}
               type="text"
               name="idolName"
               value={form.idolName}
               onChange={handleChange}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              onFocus={() => {
+                if (idolSuggestions.length > 0) setShowSuggestions(true);
+              }}
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="例：〇〇アイドル"
+              autoComplete="off"
             />
+            {showSuggestions && (
+              <ul className="absolute z-10 w-full bg-white border border-pink-200 rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
+                {idolSuggestions.map((name) => (
+                  <li
+                    key={name}
+                    onMouseDown={() => {
+                      setForm({ ...form, idolName: name });
+                      setShowSuggestions(false);
+                    }}
+                    className="px-4 py-2.5 text-sm text-gray-700 hover:bg-pink-50 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div>
