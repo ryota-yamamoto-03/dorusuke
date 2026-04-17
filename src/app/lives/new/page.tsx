@@ -22,13 +22,20 @@ export default function NewLivePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [idolSuggestions, setIdolSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showIdolSuggestions, setShowIdolSuggestions] = useState(false);
   const [allIdolNames, setAllIdolNames] = useState<string[]>([]);
 
-  // アイドル名一覧を取得
+  const [venueSuggestions, setVenueSuggestions] = useState<string[]>([]);
+  const [showVenueSuggestions, setShowVenueSuggestions] = useState(false);
+  const [allVenueNames, setAllVenueNames] = useState<string[]>([]);
+
+  // アイドル名・会場名一覧を取得
   useEffect(() => {
     fetch("/api/idols").then((r) => r.json()).then((data) => {
       if (Array.isArray(data)) setAllIdolNames(data);
+    });
+    fetch("/api/venues").then((r) => r.json()).then((data) => {
+      if (Array.isArray(data)) setAllVenueNames(data);
     });
   }, []);
 
@@ -52,6 +59,7 @@ export default function NewLivePage() {
   }
 
   const idolInputRef = useRef<HTMLInputElement>(null);
+  const venueInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -61,14 +69,27 @@ export default function NewLivePage() {
 
     if (name === "idolName") {
       if (value.trim() === "") {
-        setShowSuggestions(false);
+        setShowIdolSuggestions(false);
         setIdolSuggestions([]);
       } else {
         const filtered = allIdolNames.filter((n) =>
           n.toLowerCase().includes(value.toLowerCase())
         );
         setIdolSuggestions(filtered.slice(0, 8));
-        setShowSuggestions(filtered.length > 0);
+        setShowIdolSuggestions(filtered.length > 0);
+      }
+    }
+
+    if (name === "venue") {
+      if (value.trim() === "") {
+        setShowVenueSuggestions(false);
+        setVenueSuggestions([]);
+      } else {
+        const filtered = allVenueNames.filter((n) =>
+          n.toLowerCase().includes(value.toLowerCase())
+        );
+        setVenueSuggestions(filtered.slice(0, 8));
+        setShowVenueSuggestions(filtered.length > 0);
       }
     }
   };
@@ -139,23 +160,23 @@ export default function NewLivePage() {
               name="idolName"
               value={form.idolName}
               onChange={handleChange}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              onBlur={() => setTimeout(() => setShowIdolSuggestions(false), 150)}
               onFocus={() => {
-                if (idolSuggestions.length > 0) setShowSuggestions(true);
+                if (idolSuggestions.length > 0) setShowIdolSuggestions(true);
               }}
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="例：〇〇アイドル"
               autoComplete="off"
             />
-            {showSuggestions && (
+            {showIdolSuggestions && (
               <ul className="absolute z-10 w-full bg-white border border-pink-200 rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
                 {idolSuggestions.map((name) => (
                   <li
                     key={name}
                     onMouseDown={() => {
                       setForm({ ...form, idolName: name });
-                      setShowSuggestions(false);
+                      setShowIdolSuggestions(false);
                     }}
                     className="px-4 py-2.5 text-sm text-gray-700 hover:bg-pink-50 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
                   >
@@ -200,19 +221,41 @@ export default function NewLivePage() {
             )}
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               会場 <span className="text-pink-500">*</span>
             </label>
             <input
+              ref={venueInputRef}
               type="text"
               name="venue"
               value={form.venue}
               onChange={handleChange}
+              onBlur={() => setTimeout(() => setShowVenueSuggestions(false), 150)}
+              onFocus={() => {
+                if (venueSuggestions.length > 0) setShowVenueSuggestions(true);
+              }}
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               placeholder="例：渋谷WWW"
+              autoComplete="off"
             />
+            {showVenueSuggestions && (
+              <ul className="absolute z-10 w-full bg-white border border-pink-200 rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
+                {venueSuggestions.map((name) => (
+                  <li
+                    key={name}
+                    onMouseDown={() => {
+                      setForm({ ...form, venue: name });
+                      setShowVenueSuggestions(false);
+                    }}
+                    className="px-4 py-2.5 text-sm text-gray-700 hover:bg-pink-50 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div>
