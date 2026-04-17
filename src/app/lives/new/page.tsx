@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "仙台", "その他"];
+const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "その他"];
 
 export default function NewLivePage() {
   const { data: session, status } = useSession();
