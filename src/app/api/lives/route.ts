@@ -50,6 +50,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 重複チェック（同じイベント名・会場・日時）
+  const parsedDate = dateUndecided ? null : new Date(date);
+  const duplicate = await prisma.live.findFirst({
+    where: {
+      liveName,
+      venue,
+      ...(parsedDate
+        ? { date: parsedDate }
+        : { dateUndecided: true }),
+    },
+  });
+  if (duplicate) {
+    return NextResponse.json(
+      { error: "同じイベント名・会場・日時のライブが既に登録されています" },
+      { status: 409 }
+    );
+  }
+
   // ログインユーザーの情報を取得してLiveに直接保存
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -60,7 +78,7 @@ export async function POST(req: NextRequest) {
     data: {
       liveName,
       idolName,
-      date: dateUndecided ? null : new Date(date),
+      date: parsedDate,
       dateUndecided: !!dateUndecided,
       venue,
       area,
