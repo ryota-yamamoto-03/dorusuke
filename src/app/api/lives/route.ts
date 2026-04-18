@@ -50,20 +50,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 重複チェック（同じイベント名・会場・日時）
+  // 重複チェック（イベント名だけで弾く）
   const parsedDate = dateUndecided ? null : new Date(date);
   const duplicate = await prisma.live.findFirst({
-    where: {
-      liveName,
-      venue,
-      ...(parsedDate
-        ? { date: parsedDate }
-        : { dateUndecided: true }),
-    },
+    where: { liveName },
   });
   if (duplicate) {
     return NextResponse.json(
-      { error: "同じイベント名・会場・日時のライブが既に登録されています" },
+      { error: "重複しています" },
       { status: 409 }
     );
   }
