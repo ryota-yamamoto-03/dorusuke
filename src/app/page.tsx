@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import LiveCard from "@/components/LiveCard";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -22,9 +23,10 @@ const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "その他"]
 
 export default function HomePage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [lives, setLives] = useState<Live[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchIdol, setSearchIdol] = useState("");
+  const [searchIdol, setSearchIdol] = useState(searchParams.get("idolName") ?? "");
   const [filterArea, setFilterArea] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
