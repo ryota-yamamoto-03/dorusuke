@@ -40,9 +40,9 @@ export default async function LiveDetailPage({
 
       <div className="bg-white rounded-2xl shadow-sm border border-pink-100 overflow-hidden">
         <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{live.idolName}</span>
-            <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{live.area}</span>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full truncate max-w-[70%]">{live.idolName}</span>
+            <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full whitespace-nowrap">{live.area}</span>
           </div>
           <h1 className="text-2xl font-bold">{live.liveName}</h1>
         </div>

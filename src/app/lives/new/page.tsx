@@ -225,7 +225,7 @@ export default function NewLivePage() {
                 value={form.date}
                 onChange={handleChange}
                 required={!dateUndecided}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+                className="w-full max-w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
               />
             )}
           </div>

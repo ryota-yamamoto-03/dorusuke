@@ -139,7 +139,7 @@ export default function EditLivePage() {
               <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">日時未定</div>
             ) : (
               <input type="datetime-local" name="date" value={form.date} onChange={handleChange} required={!dateUndecided}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+                className="w-full max-w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
             )}
           </div>
 

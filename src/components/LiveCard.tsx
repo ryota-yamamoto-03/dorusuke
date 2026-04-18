@@ -33,7 +33,7 @@ export default function LiveCard({ live }: { live: Live }) {
             <span className="text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full truncate">
               {live.idolName}
             </span>
-            <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full whitespace-nowrap">
               {live.area}
             </span>
           </div>
