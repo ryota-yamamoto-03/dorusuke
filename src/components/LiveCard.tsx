@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-const SEPARATOR = /[、・,\/／\n]+/;
+// 読点・中点・スラッシュ・改行 に加え、「スペースの後ろが非ASCII（日本語など）」もセパレータとして扱う
+const SEPARATOR = /[、・,\/／\n　]+|[ ]+(?=[^\x00-\x7F])/;
 
 type Live = {
   id: string;

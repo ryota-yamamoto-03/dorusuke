@@ -20,7 +20,7 @@ export default async function LiveDetailPage({
 
   const isOwner = !!session?.user?.id && session.user.id === live.createdBy;
 
-  const idolNames = live.idolName.split(/[、・,\/／\n]+/).map((n) => n.trim()).filter(Boolean);
+  const idolNames = live.idolName.split(/[、・,\/／\n　]+|[ ]+(?=[^\x00-\x7F])/).map((n) => n.trim()).filter(Boolean);
 
   const dateLabel = (() => {
     if (live.dateUndecided || !live.date) return "日時未定";
