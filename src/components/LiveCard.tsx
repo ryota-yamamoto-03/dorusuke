@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const SEPARATOR = /[、・,\/／\n]+/;
+
 type Live = {
   id: string;
   liveName: string;
@@ -13,6 +15,8 @@ type Live = {
 };
 
 export default function LiveCard({ live }: { live: Live }) {
+  const idolNames = live.idolName.split(SEPARATOR).map((n) => n.trim()).filter(Boolean);
+
   const dateLabel = (() => {
     if (live.dateUndecided || !live.date) return "日時未定";
     const d = new Date(live.date);
@@ -29,10 +33,12 @@ export default function LiveCard({ live }: { live: Live }) {
     <Link href={`/lives/${live.id}`}>
       <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-4 hover:shadow-md hover:border-pink-300 transition-all cursor-pointer">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full truncate">
-              {live.idolName}
-            </span>
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            {idolNames.map((name) => (
+              <span key={name} className="text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+                {name}
+              </span>
+            ))}
             <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full whitespace-nowrap">
               {live.area}
             </span>
