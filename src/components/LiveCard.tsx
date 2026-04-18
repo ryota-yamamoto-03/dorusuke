@@ -34,8 +34,8 @@ export default function LiveCard({ live }: { live: Live }) {
       <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-4 hover:shadow-md hover:border-pink-300 transition-all cursor-pointer">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-            {idolNames.map((name) => (
-              <span key={name} className="text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            {idolNames.map((name, i) => (
+              <span key={`${name}-${i}`} className="text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
                 {name}
               </span>
             ))}
