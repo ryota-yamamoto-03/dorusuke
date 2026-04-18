@@ -68,12 +68,15 @@ export default function NewLivePage() {
     setForm({ ...form, [name]: value });
 
     if (name === "idolName") {
-      if (value.trim() === "") {
+      // 区切り文字で分割し、最後の入力中の単語だけで候補を絞り込む
+      const parts = value.split(/[、・,\/／\n]+/);
+      const current = parts[parts.length - 1].trim();
+      if (current === "") {
         setShowIdolSuggestions(false);
         setIdolSuggestions([]);
       } else {
         const filtered = allIdolNames.filter((n) =>
-          n.toLowerCase().includes(value.toLowerCase())
+          n.toLowerCase().includes(current.toLowerCase())
         );
         setIdolSuggestions(filtered.slice(0, 8));
         setShowIdolSuggestions(filtered.length > 0);
@@ -175,7 +178,13 @@ export default function NewLivePage() {
                   <li
                     key={name}
                     onMouseDown={() => {
-                      setForm({ ...form, idolName: name });
+                      // 最後の区切り文字までを残して候補を末尾に追加
+                      const current = form.idolName;
+                      const lastSepIndex = current.search(/[、・,\/／\n][^、・,\/／\n]*$/);
+                      const prefix = lastSepIndex >= 0
+                        ? current.slice(0, lastSepIndex + 1)
+                        : "";
+                      setForm({ ...form, idolName: prefix + name });
                       setShowIdolSuggestions(false);
                     }}
                     className="px-4 py-2.5 text-sm text-gray-700 hover:bg-pink-50 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
