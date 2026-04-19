@@ -29,6 +29,15 @@ function HomeContent() {
   const [searchIdol, setSearchIdol] = useState(searchParams.get("idolName") ?? "");
   const [filterArea, setFilterArea] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [allIdolNames, setAllIdolNames] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/idols").then((r) => r.json()).then((data) => {
+      if (Array.isArray(data)) setAllIdolNames(data);
+    });
+  }, []);
 
   const fetchLives = async (idol: string, area: string, date: string) => {
     setLoading(true);
@@ -81,13 +90,47 @@ function HomeContent() {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row gap-3">
             {/* アイドル名検索 */}
-            <input
-              type="text"
-              placeholder="🔍 アイドル名で検索..."
-              value={searchIdol}
-              onChange={(e) => setSearchIdol(e.target.value)}
-              className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="🔍 アイドル名で検索..."
+                value={searchIdol}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSearchIdol(v);
+                  if (v.trim() === "") {
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                  } else {
+                    const filtered = allIdolNames.filter((n) =>
+                      n.toLowerCase().includes(v.toLowerCase())
+                    ).slice(0, 8);
+                    setSuggestions(filtered);
+                    setShowSuggestions(filtered.length > 0);
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                autoComplete="off"
+                className="w-full border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-pink-400"
+              />
+              {showSuggestions && (
+                <ul className="absolute z-10 w-full bg-white border border-pink-200 rounded-2xl shadow-lg mt-1 max-h-48 overflow-y-auto">
+                  {suggestions.map((name) => (
+                    <li
+                      key={name}
+                      onMouseDown={() => {
+                        setSearchIdol(name);
+                        setShowSuggestions(false);
+                      }}
+                      className="px-4 py-2.5 text-sm text-gray-700 hover:bg-pink-50 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl"
+                    >
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             {/* エリアフィルター */}
             <select
               value={filterArea}
