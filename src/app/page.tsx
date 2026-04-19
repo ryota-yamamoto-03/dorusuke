@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import LiveCard from "@/components/LiveCard";
 import Link from "next/link";
@@ -21,7 +21,7 @@ type Live = {
 
 const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "その他"];
 
-export default function HomePage() {
+function HomeContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const [lives, setLives] = useState<Live[]>([]);
@@ -170,5 +170,13 @@ export default function HomePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-gray-400">読み込み中...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
