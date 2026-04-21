@@ -19,7 +19,7 @@ type Live = {
   posterXUrl: string | null;
 };
 
-const AREAS = ["東京", "大阪", "名古屋", "福岡", "札幌", "その他"];
+const AREAS = ["東京", "横浜", "大阪", "名古屋", "福岡", "札幌", "その他"];
 
 function HomeContent() {
   const { data: session } = useSession();
