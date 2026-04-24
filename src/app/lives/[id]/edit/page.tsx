@@ -164,8 +164,10 @@ export default function EditLivePage() {
             {dateUndecided ? (
               <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">未定</div>
             ) : (
-              <input type="date" name="date" value={form.date} onChange={handleChange} required={!dateUndecided}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+              <div className="w-full overflow-hidden">
+                <input type="date" name="date" value={form.date} onChange={handleChange} required={!dateUndecided}
+                  className="w-full max-w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+              </div>
             )}
           </div>
 
@@ -184,8 +186,10 @@ export default function EditLivePage() {
             {timeUndecided ? (
               <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">未定</div>
             ) : (
-              <input type="time" name="time" value={form.time} onChange={handleChange} required={!timeUndecided}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+              <div className="w-full overflow-hidden">
+                <input type="time" name="time" value={form.time} onChange={handleChange} required={!timeUndecided}
+                  className="w-full max-w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+              </div>
             )}
           </div>
 
