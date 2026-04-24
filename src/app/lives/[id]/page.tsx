@@ -28,6 +28,9 @@ export default async function LiveDetailPage({
     const dateStr = d.toLocaleDateString("ja-JP", {
       year: "numeric", month: "long", day: "numeric", weekday: "long", timeZone: "Asia/Tokyo",
     });
+    const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    const isTimeUndecided = jst.getUTCHours() === 0 && jst.getUTCMinutes() === 0;
+    if (isTimeUndecided) return `${dateStr}（時間未定）`;
     const timeStr = d.toLocaleTimeString("ja-JP", {
       hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo",
     });

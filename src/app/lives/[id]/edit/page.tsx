@@ -17,11 +17,13 @@ export default function EditLivePage() {
     liveName: "",
     idolName: "",
     date: "",
+    time: "",
     venue: "",
     area: "",
     link: "",
   });
   const [dateUndecided, setDateUndecided] = useState(false);
+  const [timeUndecided, setTimeUndecided] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -34,15 +36,26 @@ export default function EditLivePage() {
         if (data.error) { setError(data.error); return; }
         setDateUndecided(!!data.dateUndecided);
         let localDate = "";
+        let localTime = "";
+        let isTimeUndecided = false;
         if (!data.dateUndecided && data.date) {
           const d = new Date(data.date);
           const jstDate = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-          localDate = jstDate.toISOString().slice(0, 16);
+          localDate = jstDate.toISOString().slice(0, 10);
+          const h = jstDate.getUTCHours();
+          const m = jstDate.getUTCMinutes();
+          if (h === 0 && m === 0) {
+            isTimeUndecided = true;
+          } else {
+            localTime = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+          }
         }
+        setTimeUndecided(isTimeUndecided);
         setForm({
           liveName: data.liveName,
           idolName: data.idolName,
           date: localDate,
+          time: localTime,
           venue: data.venue,
           area: data.area,
           link: data.link || "",
@@ -73,12 +86,25 @@ export default function EditLivePage() {
     setLoading(true);
     setError("");
 
+    let submitDate = "";
+    if (!dateUndecided && form.date) {
+      if (timeUndecided || !form.time) {
+        submitDate = form.date + "T00:00+09:00";
+      } else {
+        submitDate = form.date + "T" + form.time + "+09:00";
+      }
+    }
+
     const res = await fetch(`/api/lives/${liveId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
-        date: form.date ? form.date + "+09:00" : "",
+        liveName: form.liveName,
+        idolName: form.idolName,
+        date: submitDate,
+        venue: form.venue,
+        area: form.area,
+        link: form.link,
         dateUndecided,
       }),
     });
@@ -126,20 +152,40 @@ export default function EditLivePage() {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-sm font-medium text-gray-700">
-                日時 {!dateUndecided && <span className="text-pink-500">*</span>}
+                日付 {!dateUndecided && <span className="text-pink-500">*</span>}
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input type="checkbox" checked={dateUndecided}
                   onChange={(e) => { setDateUndecided(e.target.checked); if (e.target.checked) setForm({ ...form, date: "" }); }}
                   className="w-4 h-4 accent-pink-500" />
-                <span className="text-sm text-gray-500">📋 日時未定</span>
+                <span className="text-sm text-gray-500">未定</span>
               </label>
             </div>
             {dateUndecided ? (
-              <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">日時未定</div>
+              <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">未定</div>
             ) : (
-              <input type="datetime-local" name="date" value={form.date} onChange={handleChange} required={!dateUndecided}
-                className="w-full max-w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+              <input type="date" name="date" value={form.date} onChange={handleChange} required={!dateUndecided}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm font-medium text-gray-700">
+                時間 {!timeUndecided && <span className="text-pink-500">*</span>}
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" checked={timeUndecided}
+                  onChange={(e) => { setTimeUndecided(e.target.checked); if (e.target.checked) setForm({ ...form, time: "" }); }}
+                  className="w-4 h-4 accent-pink-500" />
+                <span className="text-sm text-gray-500">未定</span>
+              </label>
+            </div>
+            {timeUndecided ? (
+              <div className="w-full border border-dashed border-pink-300 bg-pink-50 rounded-xl px-4 py-2.5 text-sm text-pink-400 text-center">未定</div>
+            ) : (
+              <input type="time" name="time" value={form.time} onChange={handleChange} required={!timeUndecided}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400" />
             )}
           </div>
 
