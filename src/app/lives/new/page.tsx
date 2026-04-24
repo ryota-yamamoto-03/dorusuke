@@ -234,7 +234,7 @@ export default function NewLivePage() {
                 未定
               </div>
             ) : (
-              <div className="w-full overflow-hidden">
+              <div className="w-full overflow-hidden rounded-xl">
                 <input
                   type="date"
                   name="date"
@@ -270,7 +270,7 @@ export default function NewLivePage() {
                 未定
               </div>
             ) : (
-              <div className="w-full overflow-hidden">
+              <div className="w-full overflow-hidden rounded-xl">
                 <input
                   type="time"
                   name="time"
