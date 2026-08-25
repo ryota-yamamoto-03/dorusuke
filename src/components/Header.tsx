@@ -19,6 +19,12 @@ export default function Header() {
           {session ? (
             <>
               <Link
+                href="/lives/bulk"
+                className="bg-white/20 text-white font-bold px-3 py-1.5 rounded-full hover:bg-white/30 transition text-xs hidden sm:block"
+              >
+                📋 一括投稿
+              </Link>
+              <Link
                 href="/lives/new"
                 className="bg-white text-pink-600 font-bold px-4 py-1.5 rounded-full hover:bg-pink-50 transition"
               >
