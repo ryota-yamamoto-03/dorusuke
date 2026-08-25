@@ -31,6 +31,11 @@ export default function NewLivePage() {
   const [showVenueSuggestions, setShowVenueSuggestions] = useState(false);
   const [allVenueNames, setAllVenueNames] = useState<string[]>([]);
 
+  const [tab, setTab] = useState<"manual" | "tweet">("manual");
+  const [tweetUrl, setTweetUrl] = useState("");
+  const [parsing, setParsing] = useState(false);
+  const [parseError, setParseError] = useState("");
+
   // アイドル名・会場名一覧を取得
   useEffect(() => {
     fetch("/api/idols").then((r) => r.json()).then((data) => {
@@ -99,6 +104,35 @@ export default function NewLivePage() {
     }
   };
 
+  const handleParseTweet = async () => {
+    if (!tweetUrl.trim()) return;
+    setParsing(true);
+    setParseError("");
+    const res = await fetch("/api/parse-tweet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tweetUrl: tweetUrl.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setParseError(data.error || "解析に失敗しました");
+      setParsing(false);
+      return;
+    }
+    setForm({
+      liveName: data.liveName ?? "",
+      idolName: data.idolName ?? "",
+      date: data.date ?? "",
+      time: data.time ?? "",
+      venue: data.venue ?? "",
+      area: data.area ?? "",
+      link: data.link ?? "",
+    });
+    if (data.dateUndecided) setDateUndecided(true);
+    setParsing(false);
+    setTab("manual");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -147,6 +181,37 @@ export default function NewLivePage() {
             投稿者: <span className="text-pink-500 font-medium">{session.user.name}</span>
           </p>
         </div>
+
+        {/* タブ切り替え */}
+        <div className="flex gap-2 mb-5">
+          <button type="button" onClick={() => setTab("tweet")}
+            className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${tab === "tweet" ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
+            𝕏 ツイートから入力
+          </button>
+          <button type="button" onClick={() => setTab("manual")}
+            className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${tab === "manual" ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
+            ✏️ 手動で入力
+          </button>
+        </div>
+
+        {/* ツイート入力パネル */}
+        {tab === "tweet" && (
+          <div className="mb-5 space-y-3">
+            <p className="text-sm text-gray-500">ライブ情報が書かれたツイートのURLを貼り付けると、AIが自動でフォームに入力します。</p>
+            <input
+              type="url"
+              value={tweetUrl}
+              onChange={(e) => setTweetUrl(e.target.value)}
+              placeholder="https://x.com/idol_name/status/..."
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-400"
+            />
+            {parseError && <p className="text-red-500 text-sm">{parseError}</p>}
+            <button type="button" onClick={handleParseTweet} disabled={parsing || !tweetUrl.trim()}
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+              {parsing ? "解析中..." : "🤖 AIで自動入力する"}
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
